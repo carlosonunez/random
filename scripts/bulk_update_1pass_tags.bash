@@ -2,6 +2,7 @@
 set -eo pipefail
 export OP_SESSION="${OP_SESSION?Please define OP_SESSION}"
 export OP_ACCOUNT="${OP_ACCOUNT:-my}"
+export OP_CONFIG_DIR="${OP_CONFIG_DIR:-}"
 
 usage() {
   cat <<-USAGE
@@ -21,6 +22,9 @@ ENVIRONMENT VARIABLES
                 (Default: $OP_ACCOUNT)
 
   OP_SESSION    A 1Password CLI session key.
+
+  OP_CONFIG_DIR The 1Password config directory to use. This will print a
+                warning before every 1Pass item that's updated.
 
 
 NOTES
