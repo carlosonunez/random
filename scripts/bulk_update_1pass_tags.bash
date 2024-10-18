@@ -61,7 +61,7 @@ yq_query='.[] |
 while read -u 3 -r entry
 do
   title_enc=$(sed -E 's/\&{3}/\n/g' <<< "$entry" | head -1)
-  tags_enc=$(sed -E 's/\&{3}/\n/g' <<< "$entry" | head -2 | head -1)
+  tags_enc=$(sed -E 's/\&{3}/\n/g' <<< "$entry" | head -2 | tail -1)
   vault_enc=$(sed -E 's/\&{3}/\n/g' <<< "$entry" | head -3 | tail -1)
   title=$(base64 -d <<< "$title_enc")
   tags=$(base64 -d <<< "$tags_enc")
@@ -70,15 +70,21 @@ do
   if { test -f "$cache" && grep -q "$title_enc" "$cache"; }
   then
     # shellcheck disable=SC2059
-    >&2 printf "$log_line" "skip"
+    >&2 printf "$log_line" "skip" || >&2 echo "$log_line" | sed "s/%s/skip/"
     continue
   fi
   # shellcheck disable=SC2059
-  >&2 printf "$log_line" "update"
+  # Setting --tags to an empty string doesn't seem to do anything, contrary
+  # to the documentation. However, manually setting the "tags" field to nothingausing
+  # an anonymous parameter seems to do the trick.
+  #
+  # The 1Pass CLI isn't on GitHub, so I'm not sure where to post this bug.
+  >&2 printf "$log_line" "update" || >&2 echo "$log_line" | sed "s/%s/update/"
   $(which op) item edit "$title" \
     --session "$OP_SESSION" \
     --account "$OP_ACCOUNT" \
     --vault "$vault" \
-    --tags "$tags" >/dev/null || true
+    --tags "$tags" \
+    'tags=' >/dev/null || true
   echo "$title_enc" >> "$cache"
 done 3< <(yq "$yq_query" "$file")
