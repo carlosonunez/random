@@ -11,3 +11,7 @@ any damage you cause by running these!
 They might have security issues; sorry in advance!
 
 Feel free to leave an issue, but it might take me a while to get to fixing it!
+
+## Random junk
+
+- [Update tags for 1Password items in bulk](./scripts/bulk_update_1pass_tags.bash)
